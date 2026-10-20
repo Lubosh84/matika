@@ -1,4 +1,4 @@
-MATEMATICKÝ TRENAŽÉR (verze pro dívky) – PWA BALÍČEK
+MATEMATICKÝ TRENAŽÉR – PWA BALÍČEK
 
 CO JE UVNITŘ
 - index.html: samotný trenažér
@@ -21,4 +21,4 @@ Pokud se soubory nahrávají do podsložky webu, nahrajte je všechny společně
 
 AKTUALIZACE: po nahrání nové verze otevřete aplikaci dvakrát (poprvé se stáhne novinka, podruhé se objeví). Postup Danových XP a chyb zůstává zachován.
 
-TIP: Nahrajte do jiné složky než Danovu verzi (např. /matika-holka/). Postup se ukládá zvlášť.
+TIP: Nahrajte do jiné složky než Danovu verzi (např. /matika/). Postup se ukládá zvlášť.
