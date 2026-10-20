@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#be185d">
+<meta name="description" content="Matematický trenažér pro 6.–9. ročník a přípravu na Cermat – s postupem, opakováním chyb a statistikami.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Matematický trenažér</title>
+<style>
+:root{--bg:#1a0f24;--card:#2a1838;--card2:#211330;--line:#4d2d66;--tx:#fbf3fb;--mut:#c0a3cc;--pitch:#f472b6;--sky:#c4b5fd;--gold:#fcd34d;--bad:#fb7185;--ok:#34d399}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--bg) repeating-linear-gradient(90deg,#201229 0 64px,var(--bg) 64px 128px);color:var(--tx);font:16px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+#app{max-width:680px;margin:0 auto;padding:14px 14px 40px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+[hidden]{display:none!important}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.logo{font-weight:800;font-size:18px;letter-spacing:.2px;flex:1}.logo b{color:var(--pitch)}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:5px 12px;font-size:14px;font-weight:700;white-space:nowrap}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px}
+.lvl{display:flex;justify-content:space-between;font-weight:700;margin-bottom:8px}.lvl small{color:var(--mut);font-weight:500}
+.bar{height:10px;background:var(--card2);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sky),var(--pitch));border-radius:9px;transition:width .5s}
+h2{font-size:15px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin:20px 2px 10px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mode{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:left;transition:transform .12s,border-color .12s;min-height:92px}
+.mode:hover{border-color:var(--pitch);transform:translateY(-2px)}.mode.wide{grid-column:1/-1}.mode.cer{border-color:#a78bfa}
+.mode b{display:block;font-size:18px}.mode span{color:var(--mut);font-size:13px}.mode em{float:right;font-style:normal;color:var(--gold);font-size:13px;font-weight:700}
+.ghost{padding:10px 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-weight:600}
+.btn{padding:14px 22px;border-radius:14px;background:var(--pitch);color:#2b0a1c;font-weight:800;font-size:17px;width:100%}.btn:hover{filter:brightness(1.08)}.btn.sec{background:var(--sky);color:#1f1240}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.prog{display:flex;gap:6px;margin:4px 0 14px;justify-content:center}.prog i{flex:1;max-width:36px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-size:17px;font-style:normal;background:var(--card2);border:2px solid var(--line)}.prog .cur{border-color:var(--sky);animation:pulse 1s infinite alternate}@keyframes pulse{to{box-shadow:0 0 0 4px #c4b5fd55}}
+.meta{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mut);margin-bottom:12px;gap:8px}.topic{color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.q{font-size:21px;font-weight:700;line-height:1.45;padding:16px;background:var(--card2);border-left:5px solid var(--pitch);border-radius:8px;margin-bottom:14px}
+.note{font-size:13px;color:var(--mut);margin-bottom:12px}
+input{width:100%;padding:14px;font-size:20px;border-radius:12px;border:2px solid var(--line);background:var(--card2);color:var(--tx);margin-bottom:12px;font-variant-numeric:tabular-nums}
+input:focus{border-color:var(--sky);outline:none}
+.fb{margin-top:14px;padding:16px;border-radius:12px;animation:pop .25s}.fb.ok{background:#0b3a2c;border:1px solid var(--ok)}.fb.no{background:#3d1520;border:1px solid var(--bad)}
+.fb b{font-size:18px;display:block;margin-bottom:6px}.fb p{color:#dbe9e6}
+@keyframes pop{from{transform:scale(.97);opacity:0}}
+.big{font-size:56px;text-align:center;letter-spacing:6px}.center{text-align:center}.sum{font-size:18px;margin:10px 0}.gold{color:var(--gold);font-weight:700}
+.t{display:grid;grid-template-columns:130px 1fr 44px;gap:10px;align-items:center;font-size:14px;margin:7px 0}.t .bar i{background:var(--pitch)}.t .bar.w i{background:var(--bad)}
+.h{display:flex;justify-content:space-between;font-size:14px;padding:8px 0;border-bottom:1px solid var(--line)}.h span:last-child{color:var(--mut)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--card);border:1px solid var(--pitch);padding:10px 18px;border-radius:12px;z-index:9}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.hero{background:linear-gradient(#1a0f24,#35194a);border:2px solid var(--line);border-radius:18px;padding:18px 16px 16px;margin-bottom:14px;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:8px;border:2px solid #ffffff1c;border-radius:10px}.hero:after{content:"";position:absolute;left:50%;top:8px;bottom:8px;border-left:2px solid #ffffff1c}
+.hero>*{position:relative;z-index:1}.sb{display:flex;justify-content:center;align-items:flex-start;gap:22px;font:800 46px/1 ui-monospace,Menlo,Consolas,monospace;color:var(--gold);text-shadow:0 0 14px #fbbf2466}
+.sb div{min-width:110px;text-align:center}.sb small{font:700 11px system-ui;color:var(--mut);letter-spacing:2px;display:block;margin-top:8px;text-shadow:none}
+.mode{position:relative;overflow:hidden;border-left:6px solid var(--pitch)}.mode.cer{border-left-color:#a78bfa}.mode.top{border-left-color:var(--sky)}.mode.red{border-left-color:var(--bad)}
+.mode .no{position:absolute;right:10px;bottom:-8px;font:900 64px/1 Impact,'Arial Black',system-ui;font-style:normal;color:transparent;-webkit-text-stroke:2px #ffffff22;pointer-events:none}
+.badges{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bd{padding:10px;border-radius:12px;background:var(--card2);border:1px solid var(--line);font-size:13px}.bd.off{opacity:.35;filter:grayscale(1)}.bd b{display:block;font-size:14px}
+.rep p{margin:6px 0}.rep{font-size:15px}
+#sheet{display:none}
+@media print{body{background:#fff!important;color:#111}#app>*:not(#sheet){display:none!important}#sheet{display:block;font-family:Georgia,serif;border:6px double #166534;padding:28px;color:#111}#sheet h1{text-align:center;color:#166534}#sheet table{width:100%;border-collapse:collapse;margin-top:12px}#sheet td{border-bottom:1px solid #ccc;padding:4px}}
+.opt{text-align:left;padding:14px;font-size:17px}.opt:hover{border-color:var(--pitch)}.rv{border-bottom:1px solid var(--line);padding:8px 0;font-size:14px}.rv i{font-style:normal;color:var(--bad)}
+#pcv{width:100%;height:230px;background:var(--card2);border:1px solid var(--line);border-radius:12px;touch-action:none;display:block;margin-bottom:8px;background-image:repeating-linear-gradient(transparent 0 27px,#ffffff10 27px 28px)}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="top"><div class="logo">✨ Trenažér</div><span class="chip" id="streak"></span><button class="chip" id="snd" aria-label="Zvuk"></button></div>
+<section id="home"></section>
+<section id="game" hidden>
+<div class="row" style="margin-bottom:10px"><button class="ghost" id="quit" style="flex:0">← Domů</button><span class="chip" style="text-align:center" id="clock">0:00</span><span class="chip" style="text-align:center" id="combo"></span></div>
+<div class="prog" id="prog"></div>
+<div class="panel">
+<div class="meta"><span id="mode"></span><span class="topic" id="topic"></span></div>
+<div class="q" id="q"></div>
+<p class="note">✏️ Počítej na papír, do políčka napiš jen výsledek. Zlomky jako 3/4, desetinná čísla s čárkou.</p>
+<input id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Tvůj výsledek…" aria-label="Odpověď">
+<button class="ghost" id="ptog" style="margin:0 0 12px">✏️ Papír na počítání</button>
+<div id="ppad" hidden><canvas id="pcv"></canvas><div class="row" style="margin-bottom:12px"><button class="ghost" id="pers">🧽 Guma</button><button class="ghost" id="pclr">🗑 Smazat</button></div></div>
+<div class="row" id="keys" style="margin:-4px 0 12px"><button class="ghost" data-k="-">−</button><button class="ghost" data-k="/">/</button><button class="ghost" data-k=",">,</button><button class="ghost" data-k="x">x</button><button class="ghost" data-k="²">²</button></div>
+<div id="opts" hidden style="display:grid;gap:10px;margin-bottom:12px"></div>
+<div class="row" id="act"><button class="ghost" id="skip">Nevím</button><button class="btn" id="go">Odeslat 💖</button></div>
+<div id="fb" hidden></div>
+<button class="btn sec" id="next" style="margin-top:14px" hidden>Další úkol ➔</button>
+</div>
+</section>
+<section id="result" hidden></section>
+<section id="stats" hidden></section>
+<section id="topics" hidden></section>
+<div id="sheet"></div>
+</div>
+<script>
+const database = {
+'6':[
+{topic:"Záporná čísla",q:"Vypočítej: -15 + 8 - (-4)",a:"-3",exp:"Mínus před závorkou mění znaménko: -(-4) = +4. Tedy -15 + 8 + 4 = -3."},
+{topic:"Zlomky",q:"Zkrať zlomek 45/60 na základní tvar (piš jako a/b)",a:"3/4",exp:"Obě čísla vydělíme 15: 45 : 15 = 3 a 60 : 15 = 4."},
+{topic:"Slovní úloha",q:"Autobus ujel 180 km za 3 hodiny. Jakou jel průměrnou rychlostí v km/h?",a:"60",exp:"Rychlost v = s / t, tedy 180 : 3 = 60 km/h."},
+{topic:"Desetinná čísla",q:"Vypočítej: 12,5 · 4",a:"50",exp:"12,5 · 4 = 50."},
+{topic:"Geometrie",q:"Obvod čtverce je 36 cm. Jaká je délka jedné strany v cm?",a:"9",exp:"Čtverec má 4 stejné strany: 36 : 4 = 9 cm."},
+{topic:"Dělitelnost",q:"Jaký je největší společný dělitel čísel 24 a 36?",a:"12",exp:"Největší číslo, kterým lze 24 i 36 beze zbytku dělit, je 12."},
+{topic:"Úhly",q:"Jeden úhel v trojúhelníku má 70° a druhý 50°. Kolik stupňů má třetí úhel?",a:"60",exp:"Součet vnitřních úhlů trojúhelníku je 180°: 180 − 70 − 50 = 60°."},
+{topic:"Převody jednotek",q:"Převeď na metry: 3,2 km = ? m",a:"3200",exp:"1 km = 1 000 m, takže 3,2 · 1 000 = 3 200 m."},
+{topic:"Pořadí operací",q:"Vypočítej: 450 - 75 · 2",a:"300",exp:"Nejdříve násobení: 75 · 2 = 150. Potom 450 − 150 = 300."},
+{topic:"Zlomky a celky",q:"Kolik je jedna třetina z 90?",a:"30",exp:"90 : 3 = 30."}],
+'7':[
+{topic:"Zlomky",q:"Vypočítej: 2/3 + 1/4 (zapiš jako a/b)",a:"11/12",exp:"Společný jmenovatel je 12: 8/12 + 3/12 = 11/12."},
+{topic:"Procenta",q:"Mikina stála 2000 Kč a byly zlevněny o 20 %. Kolik stojí po slevě?",a:"1600",exp:"20 % z 2 000 Kč je 400 Kč. Nová cena: 2 000 − 400 = 1 600 Kč."},
+{topic:"Nepřímá úměrnost",q:"4 holky uklidí klubovnu za 30 minut. Za kolik minut by ji uklidilo 6 holek?",a:"20",exp:"Celková práce: 4 · 30 = 120 dívkominut. 120 : 6 = 20 minut."},
+{topic:"Záporná čísla",q:"Vypočítej: (-6) · (-7) + 8",a:"50",exp:"(-6) · (-7) = 42; 42 + 8 = 50."},
+{topic:"Poměr",q:"Rozděl 600 Kč v poměru 2 : 3. Kolik činí větší část?",a:"360",exp:"Celkem 5 dílů; 600 : 5 = 120 Kč za díl. Větší část je 3 · 120 = 360 Kč."},
+{topic:"Dělení zlomků",q:"Vypočítej: (1/2) : (3/4) (zapiš jako a/b)",a:"2/3",exp:"Dělení zlomkem převedeme na násobení převráceným zlomkem: 1/2 · 4/3 = 4/6 = 2/3."},
+{topic:"Desetinná čísla",q:"Vypočítej: -4,5 - (-2,1)",a:"-2,4",exp:"-4,5 − (−2,1) = −4,5 + 2,1 = −2,4."},
+{topic:"Procenta",q:"30 % z nějakého čísla je 45. Jaké je to číslo?",a:"150",exp:"1 % = 45 : 30 = 1,5. Celých 100 % je 1,5 · 100 = 150."},
+{topic:"Slovní úloha",q:"Za 3 kg jablek zaplatila Kamila 90 Kč. Kolik zaplatí za 5 kg?",a:"150",exp:"1 kg stojí 90 : 3 = 30 Kč. Za 5 kg zaplatí 5 · 30 = 150 Kč."},
+{topic:"Výrazy",q:"Vypočítej hodnotu výrazu pro x = 5: 3x - 7",a:"8",exp:"Dosadíme: 3 · 5 − 7 = 15 − 7 = 8."}],
+'8':[
+{topic:"Úprava výrazů",q:"Zjednoduš výraz: 5x - 3 + 2x + 8",a:"7x+5",exp:"Sečteme členy s x: 5x + 2x = 7x. Čísla: −3 + 8 = 5. Výsledek 7x + 5."},
+{topic:"Lineární rovnice",q:"Vyřeš rovnici: 3x - 5 = x + 7",a:"6",exp:"2x − 5 = 7, tedy 2x = 12 a x = 6."},
+{topic:"Pythagorova věta",q:"Odvěsny pravoúhlého trojúhelníku jsou 6 cm a 8 cm. Jaká je přepona c v cm?",a:"10",exp:"c² = 6² + 8² = 36 + 64 = 100, proto c = 10 cm."},
+{topic:"Závorky",q:"Roznásob a zjednoduš: 3(x - 2) - 2x",a:"x-6",exp:"3(x − 2) − 2x = 3x − 6 − 2x = x − 6."},
+{topic:"Mnohočleny",q:"Vypočítej: (x + 4)(x - 2) (zapiš jako x^2+2x-8)",a:"x^2+2x-8",exp:"x·x − 2x + 4x − 8 = x² + 2x − 8."},
+{topic:"Objem a jednotky",q:"Kolik je 0,5 m³ v litrech?",a:"500",exp:"1 m³ = 1 000 litrů, takže 0,5 m³ = 500 litrů."},
+{topic:"Rovnice se zlomkem",q:"Vyřeš rovnici: (x + 3) / 2 = 5",a:"7",exp:"Vynásobíme obě strany dvěma: x + 3 = 10, tedy x = 7."},
+{topic:"Statistika",q:"Měla jsi v 5 testech známky: 1, 3, 2, 4, 5. Jaký je tvůj průměr?",a:"3",exp:"Součet známek je 15. Průměr: 15 : 5 = 3."},
+{topic:"Procenta",q:"Cena vstupenky na koncert byla 500 Kč a zdražila o 10 %. Kolik stojí nově?",a:"550",exp:"10 % z 500 Kč je 50 Kč. Nová cena je 500 + 50 = 550 Kč."},
+{topic:"Obsah kruhu",q:"Vypočítej obsah kruhu s poloměrem r = 10 cm. Použij π = 3,14.",a:"314",exp:"S = π · r² = 3,14 · 10² = 3,14 · 100 = 314 cm²."}],
+'9':[
+{topic:"Goniometrie",q:"V pravoúhlém trojúhelníku je protilehlá odvěsna 3 a přepona 5. Kolik je sin(α)? (zapiš zlomkem)",a:"3/5",exp:"Sinus je poměr protilehlé odvěsny a přepony: sin(α) = 3/5 = 0,6."},
+{topic:"Kvadratické rovnice",q:"Napiš menší kořen rovnice x² - 5x + 6 = 0",a:"2",exp:"Rozklad: (x − 2)(x − 3) = 0. Kořeny jsou 2 a 3, menší je 2."},
+{topic:"Podobnost",q:"Dva podobné trojúhelníky mají poměr stran 1:3. Jaký je poměr jejich obsahů? Zadej větší číslo poměru.",a:"9",exp:"Poměr obsahů je druhá mocnina poměru stran: 1² : 3² = 1 : 9."},
+{topic:"Mocniny",q:"Vypočítej: 2³ + 3²",a:"17",exp:"2³ = 8 a 3² = 9. Součet je 17."},
+{topic:"Odmocniny",q:"Vypočítej: √144 + √81",a:"21",exp:"√144 = 12 a √81 = 9. Součet je 21."},
+{topic:"Lomené výrazy",q:"Pro jaké x není výraz 5 / (x - 4) definován?",a:"4",exp:"Jmenovatel nesmí být nula: x − 4 = 0, tedy x = 4."},
+{topic:"Objem těles",q:"Jaký je objem krychle o hraně a = 3 cm v cm³?",a:"27",exp:"V = a³ = 3 · 3 · 3 = 27 cm³."},
+{topic:"Práce",q:"První stroj udělá práci za 2 hodiny, druhý za 3 hodiny. Za kolik hodin ji udělají společně? (zapiš a/b)",a:"6/5",exp:"Za hodinu udělají 1/2 + 1/3 = 5/6 práce. Celá práce trvá 6/5 hodiny."},
+{topic:"Lineární funkce",q:"Urči y-ovou souřadnici průsečíku přímky y = 2x - 6 s osou y.",a:"-6",exp:"Na ose y je x = 0. Dosadíme: y = 2 · 0 − 6 = −6."},
+{topic:"Úprava výrazu",q:"Vypočítej pro x = -1: x² + 2x + 1",a:"0",exp:"(−1)² + 2 · (−1) + 1 = 1 − 2 + 1 = 0."}],
+'cermat':[
+{topic:"Cermat – Výrazy",q:"Urči hodnotu výrazu pro x = -2: (3x + 1)²",a:"25",exp:"3 · (−2) + 1 = −5. Potom (−5)² = 25."},
+{topic:"Cermat – Geometrie",q:"Obsah obdélníku je 48 cm² a jedna strana 6 cm. Jaký je obvod v cm?",a:"28",exp:"Druhá strana je 48 : 6 = 8 cm. Obvod: 2 · (6 + 8) = 28 cm."},
+{topic:"Cermat – Rovnice",q:"Vyřeš rovnici: (2x - 1) / 3 = 3",a:"5",exp:"2x − 1 = 9, tedy 2x = 10 a x = 5."},
+{topic:"Cermat – Zlomky",q:"Vypočítej: 1 - (3/4 - 1/2) (zapiš jako a/b)",a:"3/4",exp:"V závorce: 3/4 − 1/2 = 1/4. Potom 1 − 1/4 = 3/4."},
+{topic:"Cermat – Slovní úloha",q:"Vlak ujel 150 km za 2 hodiny a 30 minut. Jaká byla průměrná rychlost v km/h?",a:"60",exp:"2 hodiny 30 minut = 2,5 hodiny. Rychlost = 150 : 2,5 = 60 km/h."},
+{topic:"Cermat – Procenta",q:"Cena vzrostla z 400 Kč na 460 Kč. O kolik procent stoupla?",a:"15",exp:"Nárůst je 60 Kč. 60 : 400 · 100 = 15 %."},
+{topic:"Cermat – Lomené výrazy",q:"Výraz (x² - 4) / (x - 2) zkrať. Jaká hodnota vyjde pro x = 5?",a:"7",exp:"x² − 4 = (x − 2)(x + 2). Po zkrácení zůstane x + 2; pro x = 5 vyjde 7. Podmínka: x ≠ 2."},
+{topic:"Cermat – Úhly",q:"V rovnoběžníku má jeden vnitřní úhel 75°. Jak velký je sousední úhel na stejném boku?",a:"105",exp:"Sousední úhly v rovnoběžníku mají součet 180°: 180° − 75° = 105°."},
+{topic:"Cermat – Rychlost",q:"Běžkyně běží rychlostí 12 km/h. Kolik metrů uběhne za 1 minutu?",a:"200",exp:"12 km = 12 000 m za 60 minut. 12 000 : 60 = 200 m za minutu."},
+{topic:"Cermat – Kombinace",q:"Kolik je 25 % ze 400, zvětšené o 50?",a:"150",exp:"25 % ze 400 je 100. Po přičtení 50 dostaneme 150."}]
+};
+const $=id=>document.getElementById(id),r=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pick=a=>a[r(0,a.length-1)],gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+const LS='trenazer-holka-v1',TITLES=['Začátečnice','Hvězdička','Talent','Influencerka','Královna matiky','Legenda'];
+let S={xp:0,box:{},wrong:{},hist:[],topics:{},best:{},last:'',streak:0,sound:1};
+try{Object.assign(S,JSON.parse(localStorage.getItem(LS)||'{}'))}catch(e){}
+if(!S.name){S.name=(prompt('Jak ti říkají? (jméno se zobrazí v aplikaci)')||'').trim().slice(0,20)||'Hvězdo';try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
+const save=()=>{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}};
+const sup=['','','²','³','⁴','⁵'],sg=n=>n<0?'- '+-n:'+ '+n;
+// ---- Generátory příkladů (nekonečný trénink) ----
+const g7=[()=>{const p=r(2,30)*100,s=pick([10,20,25,30,40,50]),d=p*s/100;return{topic:'Procenta',q:`Tričko stálo ${p} Kč a bylo zlevněno o ${s} %. Kolik stojí po slevě?`,a:String(p-d),exp:`${s} % z ${p} Kč je ${d} Kč. Nová cena: ${p} − ${d} = ${p-d} Kč.`}},
+()=>{const m=r(1,4),n=m+r(1,4),k=r(20,90),t=k*(m+n);return{topic:'Poměr',q:`Rozděl ${t} Kč v poměru ${m} : ${n}. Kolik činí větší část?`,a:String(k*n),exp:`Dílů je ${m+n}; jeden díl ${t} : ${m+n} = ${k} Kč. Větší část: ${n} · ${k} = ${k*n} Kč.`}},
+()=>{const a=r(3,6),b=a+r(1,4),u=r(2,6),ta=b*u;return{topic:'Nepřímá úměrnost',q:`${a} ${hr(a)} uklidí klubovnu za ${ta} minut. Za kolik minut ji uklidí ${b} ${hr(b)}?`,a:String(a*u),exp:`Práce: ${a} · ${ta} = ${a*ta}. Dělíme počtem holek: ${a*ta} : ${b} = ${a*u} min.`}}];
+const g8=[()=>{const a=r(2,9),x=pick([-9,-7,-5,-3,-2,2,3,4,6,8]),b=r(1,20),c=a*x+b;return{topic:'Lineární rovnice',q:`Vyřeš rovnici: ${a}x + ${b} = ${c}`,a:String(x),exp:`${a}x = ${c} − ${b} = ${c-b}, tedy x = ${c-b} : ${a} = ${x}.`}},
+()=>{const T=pick([[3,4,5],[5,12,13],[8,15,17],[7,24,25]]),k=r(1,3),[a,b,c]=T.map(v=>v*k);return{topic:'Pythagorova věta',q:`Odvěsny pravoúhlého trojúhelníku jsou ${a} cm a ${b} cm. Jaká je přepona v cm?`,a:String(c),exp:`c² = ${a}² + ${b}² = ${a*a} + ${b*b} = ${c*c}, proto c = ${c} cm.`}},
+()=>{const R=r(2,12),v=314*R*R/100;return{topic:'Obsah kruhu',q:`Obsah kruhu s poloměrem ${R} cm (π = 3,14) v cm²:`,a:String(v),exp:`S = π · r² = 3,14 · ${R}² = 3,14 · ${R*R} = ${String(v).replace('.',',')} cm².`}}];
+const g9=[()=>{const a=r(2,5),b=r(2,3),c=pick([16,25,36,49,64,81,100,121,144]),v=a**b+Math.sqrt(c);return{topic:'Mocniny a odmocniny',q:`Vypočítej: ${a}${sup[b]} + √${c}`,a:String(v),exp:`${a}${sup[b]} = ${a**b}, √${c} = ${Math.sqrt(c)}. Součet je ${v}.`}},
+()=>{let p,q;do{p=r(-6,3);q=p+r(1,6)}while(!p||!q||p+q===0);const B=-(p+q),C=p*q;return{topic:'Kvadratické rovnice',q:`Napiš menší kořen rovnice x² ${sg(B)}x ${sg(C)} = 0`,a:String(p),exp:`Rozklad: (x ${sg(-p)})(x ${sg(-q)}) = 0. Kořeny jsou ${p} a ${q}, menší je ${p}.`}},
+()=>{const a=r(2,9),b=r(2,9),c=r(2,9);return{topic:'Objem těles',q:`Kvádr má hrany ${a} cm, ${b} cm a ${c} cm. Jaký je objem v cm³?`,a:String(a*b*c),exp:`V = a · b · c = ${a} · ${b} · ${c} = ${a*b*c} cm³.`}}];
+const gC=[()=>{const v=r(3,10)*10,t=pick([1.5,2.5,3.5]),d=v*t;return{topic:'Rychlost',q:`Vlak ujel ${d} km za ${String(t).replace('.',',')} h. Jaká byla průměrná rychlost v km/h?`,a:String(v),exp:`v = s : t = ${d} : ${t} = ${v} km/h.`}},g7[0],g8[0],g9[1]];
+const sh=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(p=>p[1]);
+const mc=(topic,q,right,wrong,exp)=>{const o=sh([right,...wrong]);return{topic,q,o,a:'ABCDE'[o.indexOf(right)],exp}},yn=(topic,q,t,exp)=>({topic,q,o:['ANO','NE'],a:t?'ANO':'NE',exp});
+const hr=n=>n>=5?'holek':'holky',D=v=>String(+v.toFixed(4)).replace('.',',');
+g7.push(()=>{const a=r(1,6)*20,p=pick([10,20,25,50]),b=a*(100+p)/100;return{topic:'Procenta',q:`Kamila měla loni ${a} tisíc sledujících na Instagramu, letos ${b} tisíc. O kolik procent jí přibylo?`,a:String(p),exp:`Rozdíl ${b-a} tisíc dělíme původním počtem: ${b-a} : ${a} = ${p/100} = ${p} %.`}},
+()=>{const w=r(3,12),d=r(0,6),l=r(0,6);return{topic:'Tabulka a body',q:`Dívčí házenkářský tým má ${w} výher, ${d} remíz a ${l} proher. Za výhru jsou 3 body, za remízu 1, za prohru 0. Kolik má bodů?`,a:String(3*w+d),exp:`3 · ${w} + ${d} = ${3*w+d} bodů.`}},
+()=>{const b=pick([4,5,6,8]),a=r(1,b-1),k=r(2,6),n=b*k;return{topic:'Zlomky a celky',q:`Na táboře je ${n} dětí. Na tanec chodí ${a}/${b} z nich. Kolik dětí na tanec nechodí?`,a:String(n-a*k),exp:`${n} : ${b} = ${k}, na tanec chodí ${a} · ${k} = ${a*k}. Nechodí ${n} − ${a*k} = ${n-a*k}.`}});
+g8.push(()=>{const m=r(2,10)*50,d=r(1,10)*50,k=m+d;return{topic:'Soustava a slovní úloha',q:`Tričko a mikina stojí dohromady ${m+k} Kč. Mikina je o ${d} Kč dražší než tričko. Kolik stojí tričko?`,a:String(m),exp:`Kdyby byly stejně drahé, platilo by se ${m+k} − ${d} = ${m+k-d} Kč za dvě trička. Tričko: ${m+k-d} : 2 = ${m} Kč.`}},
+()=>{const R=pick([5,10,15,25,50]),o=+(6.28*R).toFixed(2);return{topic:'Obvod kruhu',q:`Obvod kruhu s poloměrem ${R} cm (π = 3,14) v cm:`,a:String(o),exp:`o = 2 · π · r = 2 · 3,14 · ${R} = ${D(o)} cm.`}},
+()=>{const v=sh([r(1,20),r(21,40),r(41,60),r(61,80),r(81,99)]),m=[...v].sort((x,y)=>x-y)[2];return{topic:'Statistika',q:`Najdi medián (prostřední hodnotu) čísel: ${v.join(', ')}`,a:String(m),exp:`Seřadíme: ${[...v].sort((x,y)=>x-y).join(', ')}. Uprostřed je ${m}.`}});
+g9.push(()=>{const s=pick([24,30,36,48,60]),t=pick([10,15,20,30,45,60]),d=s*t/60,v1=s/2-r(1,4)*2;return{topic:'Pohyb a rychlost',q:`Dvě kamarádky vyjedou na kolech proti sobě ze vzdálenosti ${d} km rychlostmi ${v1} km/h a ${s-v1} km/h. Za kolik minut se potkají?`,a:String(t),exp:`Sbližují se rychlostí ${v1} + ${s-v1} = ${s} km/h. Čas: ${d} : ${s} h = ${t} minut.`}},
+()=>{const n=r(5,12);return{topic:'Kombinatorika',q:`Kolika způsoby lze z ${n} dívek vybrat dvojici do štafety (na pořadí nezáleží)?`,a:String(n*(n-1)/2),exp:`Každý se spojí s ${n-1} dalšími, ale dvojice se počítá dvakrát: ${n} · ${n-1} : 2 = ${n*(n-1)/2}.`}},
+()=>{const k=pick([10000,25000,50000,100000]),m=r(2,12),km=m*k/100000;return{topic:'Měřítko mapy',q:`Na mapě v měřítku 1 : ${k} je vzdálenost ${m} cm. Kolik km je to ve skutečnosti?`,a:String(+km.toFixed(3)),exp:`${m} · ${k} = ${m*k} cm = ${D(km)} km.`}},
+()=>{const m=r(2,12),e=r(1,2),a=3*m-4+e;return{topic:'Nerovnice',q:`Najdi nejmenší celé číslo x, pro které platí 3x − 4 > ${a}`,a:String(m+1),exp:`3x > ${a+4}, x > ${D((a+4)/3)}. Nejmenší celé číslo je ${m+1}.`}},
+()=>{const p=r(2,10)*100;return{topic:'Procenta',q:`Zboží za ${p} Kč zlevnili nejdřív o 20 %, pak o dalších 25 %. Kolik stojí nakonec?`,a:String(p*.6),exp:`${p} · 0,8 = ${p*.8}; ${p*.8} · 0,75 = ${p*.6} Kč.`}},
+()=>{const a=r(2,9),d=r(2,7),n=r(15,30);return{topic:'Posloupnosti',q:`Aritmetická posloupnost začíná ${a}, ${a+d}, ${a+2*d}, … Jaký je její ${n}. člen?`,a:String(a+(n-1)*d),exp:`${n}. člen = ${a} + ${n-1} · ${d} = ${a+(n-1)*d}.`}},
+()=>{const b=r(1,5),f=b+r(3,10),h=b+r(2,8),n=f+h-b+r(1,6);return{topic:'Množiny (Vennův diagram)',q:`V kroužcích je ${n} dětí. Na tanec chodí ${f}, na kreslení ${h} a na oba ${b}. Kolik dětí nechodí na ani jeden?`,a:String(n-(f+h-b)),exp:`Aspoň jeden sport hraje ${f} + ${h} − ${b} = ${f+h-b} dětí. Ostatní: ${n} − ${f+h-b} = ${n-(f+h-b)}.`}});
+gC.push(g7[3],g7[4],g8[3],g8[5],g9[3],g9[4],g9[5],g9[6],g9[7],g9[8],g9[9],()=>mc('Zlomky','Který zlomek je největší?','7/8',['2/3','3/4','5/7'],'Společný jmenovatel 168: 7/8 = 147/168, 2/3 = 112/168, 3/4 = 126/168, 5/7 = 120/168.'));
+database.cermat.push(mc('Cermat – Geometrie','Kolik stupňů má vnitřní úhel pravidelného šestiúhelníku?','120°',['60°','108°','135°','150°'],'Součet úhlů šestiúhelníku je 4 · 180° = 720°, jeden úhel 720 : 6 = 120°.'),
+mc('Cermat – Výrazy','Který výraz je roven (x + 3)²?','x² + 6x + 9',['x² + 9','x² + 3x + 9','x² + 6x + 6'],'Vzorec (a + b)² = a² + 2ab + b².'),
+mc('Cermat – Statistika','Medián čísel 2, 9, 4, 7, 4 je:','4',['5','6','9'],'Seřazeno 2, 4, 4, 7, 9 – uprostřed je 4.'),
+yn('Cermat – Dělitelnost','Číslo 2 187 je dělitelné třemi.',true,'Ciferný součet 2+1+8+7 = 18 je dělitelný třemi.'),
+yn('Cermat – Procenta','Zdražíme-li o 10 % a pak zlevníme o 10 %, vrátíme se na původní cenu.',false,'Např. 100 → 110 → 99. Sleva se počítá z vyšší ceny.'));
+const G={'6':[()=>{const x=r(5,30),y=r(5,30),z=r(2,15),v=-x+y+z;return{topic:'Záporná čísla',q:`Vypočítej: -${x} + ${y} - (-${z})`,a:String(v),exp:`-(-${z}) = +${z}. Tedy -${x} + ${y} + ${z} = ${v}.`}},
+()=>{const k=r(2,9),d=r(1,9),v=k*1000+d*100;return{topic:'Převody jednotek',q:`Převeď na metry: ${k},${d} km = ? m`,a:String(v),exp:`1 km = 1 000 m, takže ${k},${d} · 1 000 = ${v} m.`}},
+()=>{const a=r(10,90),b=r(2,9),c=r(2,9);return{topic:'Pořadí operací',q:`Vypočítej: ${a} + ${b} · ${c}`,a:String(a+b*c),exp:`Nejdříve násobení: ${b} · ${c} = ${b*c}. Pak ${a} + ${b*c} = ${a+b*c}.`}}],'7':g7,'8':g8,'9':g9,cermat:gC.map(f=>()=>{const x=f();x.topic='Cermat – '+x.topic;return x})};
+G['6'].push(()=>{const [a,b]=pick([[1,2],[2,3],[3,4],[3,5],[4,5],[5,6],[2,5],[3,7],[5,8]]),m=r(2,9);return{topic:'Zlomky',q:`Zkrať zlomek ${a*m}/${b*m} na základní tvar (piš jako a/b)`,a:a+'/'+b,exp:`Obě čísla vydělíme ${m}: ${a*m} : ${m} = ${a} a ${b*m} : ${m} = ${b}.`}},
+()=>{const s=r(3,25);return{topic:'Geometrie',q:`Obvod čtverce je ${4*s} cm. Jaká je délka jedné strany v cm?`,a:String(s),exp:`Čtverec má 4 stejné strany: ${4*s} : 4 = ${s} cm.`}},
+()=>{const x=r(30,85),y=r(30,85);return{topic:'Úhly',q:`Dva úhly v trojúhelníku mají ${x}° a ${y}°. Kolik stupňů má třetí?`,a:String(180-x-y),exp:`180 − ${x} − ${y} = ${180-x-y}°.`}},
+()=>{const v=r(4,15)*10,t=r(2,6);return{topic:'Slovní úloha',q:`Autobus ujel ${v*t} km za ${t} h. Jakou jel průměrnou rychlostí v km/h?`,a:String(v),exp:`v = s : t = ${v*t} : ${t} = ${v} km/h.`}},
+()=>{const b=pick([3,4,5,6,8]),a=r(1,b-1),k=r(2,9);return{topic:'Zlomky a celky',q:`Kolik je ${a}/${b} z ${b*k}?`,a:String(a*k),exp:`${b*k} : ${b} = ${k}, a ${a} · ${k} = ${a*k}.`}});
+g7.push(()=>{let a,b,c,d,n,e;do{a=r(1,3);b=pick([2,3,4,6]);c=r(1,3);d=pick([2,3,4,6]);n=a*d+c*b;e=b*d}while(n%e===0);const g=gcd(n,e);return{topic:'Zlomky',q:`Vypočítej: ${a}/${b} + ${c}/${d} (zapiš jako a/b, nejlépe zkráceně)`,a:n/g+'/'+e/g,exp:`Společný jmenovatel ${e}: ${a*d}/${e} + ${c*b}/${e} = ${n}/${e} = ${n/g}/${e/g}.`}},
+()=>{const a=r(2,9),b=r(2,9),c=r(1,30);return{topic:'Záporná čísla',q:`Vypočítej: (-${a}) · ${b} + ${c}`,a:String(c-a*b),exp:`(-${a}) · ${b} = ${-a*b}; ${-a*b} + ${c} = ${c-a*b}.`}},
+()=>{const x=r(-5,9),a=r(2,9),b=r(1,12);return{topic:'Výrazy',q:`Vypočítej hodnotu výrazu pro x = ${x}: ${a}x - ${b}`,a:String(a*x-b),exp:`Dosadíme: ${a} · (${x}) − ${b} = ${a*x} − ${b} = ${a*x-b}.`}},
+()=>{const k=r(2,6),c=r(3,9)*10,p=pick([2,4,5,8]);return{topic:'Slovní úloha',q:`Za ${k} kg jablek zaplatila Kamila ${k*c} Kč. Kolik zaplatí za ${p} kg?`,a:String(p*c),exp:`1 kg stojí ${k*c} : ${k} = ${c} Kč. Za ${p} kg: ${p} · ${c} = ${p*c} Kč.`}});
+g8.push(()=>{const a=r(2,6),c=r(2,9),b=r(1,9);return{topic:'Rovnice se zlomkem',q:`Vyřeš rovnici: (x + ${b}) / ${a} = ${c}`,a:String(a*c-b),exp:`Vynásobíme ${a}: x + ${b} = ${a*c}, tedy x = ${a*c-b}.`}},
+()=>{const a=r(2,7),b=r(1,9),k=r(2,9);return{topic:'Závorky',q:`Vyřeš rovnici: ${a}(x - ${b}) = ${a*k}`,a:String(k+b),exp:`x − ${b} = ${a*k} : ${a} = ${k}, tedy x = ${k+b}.`}});
+g9.push(()=>{const k=r(2,5),q=pick([-9,-7,-5,-4,-3,-2,2,3,4,6,8]);return{topic:'Lineární funkce',q:`Urči y-ovou souřadnici průsečíku přímky y = ${k}x ${sg(q)} s osou y.`,a:String(q),exp:`Na ose y je x = 0, takže y = ${q}.`}},
+()=>{const a=pick([-7,-5,-3,-2,2,3,5,8]);return{topic:'Lomené výrazy',q:`Pro jaké x není výraz 5 / (x ${sg(-a)}) definován?`,a:String(a),exp:`Jmenovatel nesmí být 0: x ${sg(-a)} = 0, tedy x = ${a}.`}},
+()=>{const a=r(2,9);return{topic:'Objem těles',q:`Jaký je objem krychle o hraně ${a} cm v cm³?`,a:String(a**3),exp:`V = a³ = ${a} · ${a} · ${a} = ${a**3} cm³.`}});
+const MODES=[['6','6. ročník','Základy a záporná čísla'],['7','7. ročník','Zlomky, procenta, poměr'],['8','8. ročník','Rovnice, Pythagoras'],['9','9. ročník','Kvadratické rovnice, goniometrie'],['cermat','🎯 Cermat výzva','Příprava na přijímačky'],['exam','🏁 Generálka','Jako ostrá zkouška: 16 úloh, 50 min, výsledky až na konci'],['dnes','⚡ Dnešní trénink','Mix podle tvých slabých míst – začni tady']];
+const BASE=MODES.filter(m=>!['exam','dnes'].includes(m[0])),W={cermat:' cer wide',exam:' cer wide',dnes:' top wide'},IC={cermat:'🏆',exam:'🏁',dnes:'⚡'};
+const modeName=m=>m==='chyby'?'Opravna chyb':m.startsWith('t:')?'🎯 '+m.slice(2):(MODES.find(x=>x[0]===m)||[])[1];
+// ---- Kontrola odpovědi ----
+const norm=s=>String(s).trim().toLowerCase().replace(/\s+/g,'').replace(/,/g,'.').replace(/[−–]/g,'-').replace(/²/g,'^2').replace(/³/g,'^3').replace(/[·*]/g,'').replace(/π/g,'pi').replace(/^[a-z]=/,'').replace(/(kč|km\/h|km|cm\^?[23]?|m\^?[23]?|min|hod|kg|l|%|°)+$/,'');
+const F=/^(-?\d+)\/(\d+)$/,N=/^[-+]?\d+(\.\d+)?$/,num=s=>N.test(s)?+s:F.test(s)?(m=>m[1]/m[2])(s.match(F)):NaN;
+const ev=(s,x)=>{s=s.replace(/\^/g,'**').replace(/(\d|\))(?=x|\()/g,'$1*').replace(/x(?=\d|\(|x)/g,'x*').replace(/\)(?=\d)/g,')*');if(!/^[\dx+\-*/().]+$/.test(s))return NaN;try{return Function('x','return '+s)(x)}catch(e){return NaN}};
+// Uznává 0,75 místo 3/4, jednotky, "x=6" i jiný tvar výrazu (5+7x místo 7x+5); nezkrácený zlomek ne.
+function same(u,c){u=norm(u);c=norm(c);if(u===c)return true;const a=num(u),b=num(c);
+ if(!isNaN(a)&&!isNaN(b)){const f=u.match(F);return Math.abs(a-b)<1e-9&&(!f||gcd(+f[1],+f[2])===1)}
+ if(/x/.test(c))return[2,3,-1.5].every(t=>{const p=ev(u,t),q=ev(c,t);return isFinite(p)&&Math.abs(p-q)<1e-9});return false}
+// ---- Hráč, úroveň, série ----
+const lvl=()=>Math.floor(Math.sqrt(S.xp/40))+1;
+function head(){document.querySelector('.logo').innerHTML='✨ Trenažér <b>'+S.name.replace(/</g,'&lt;')+'</b>';$('streak').textContent='🔥 '+S.streak+' '+(S.streak==1?'den':S.streak>1&&S.streak<5?'dny':'dní');$('snd').textContent=S.sound?'🔊':'🔇'}
+function beep(f,d=.12){if(!S.sound||M.exam)return;try{const c=beep.c=beep.c||new AudioContext(),o=c.createOscillator(),g=c.createGain();o.frequency.value=f;g.gain.value=.08;o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+d)}catch(e){}}
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),2200)}
+function show(id){['home','game','result','stats','topics'].forEach(s=>$(s).hidden=s!==id);clearInterval(M.timer);if(id==='game')M.timer=setInterval(tick,1000);scrollTo(0,0)}
+// ---- Domů ----
+const tot=()=>{const V=Object.values(S.topics);return{g:V.reduce((a,v)=>a+v.c,0),ms:V.reduce((a,v)=>a+v.t-v.c,0)}};
+function home(){const L=lvl(),lo=40*(L-1)**2,hi=40*L*L,wr=Object.keys(S.wrong).length,{g,ms}=tot();head();
+ $('home').innerHTML=`<div class="hero"><div class="sb"><div>${g}<small>JÁ</small></div><span>:</span><div>${ms}<small>MATIKA</small></div></div><div class="lvl" style="margin:16px 0 8px"><span>Úroveň ${L} · ${TITLES[Math.min(L-1,5)]}</span><small>${S.xp} XP</small></div><div class="bar"><i style="width:${Math.round((S.xp-lo)/(hi-lo)*100)}%"></i></div></div>
+<h2>Vyber výzvu</h2><div class="modes">${[MODES[6],...BASE,MODES[5]].map(m=>`<button class="mode${W[m[0]]||''}" data-m="${m[0]}"><i class="no">${IC[m[0]]||m[0]}</i><em>${S.best[m[0]]!=null?'★ '+S.best[m[0]]+' %':''}</em><b>${m[1]}</b><span>${m[2]}</span></button>`).join('')}
+<button class="mode top wide" id="tp"><i class="no">🎯</i><b>Trénink podle tématu</b><span>Vyber si slabé místo a procvičuj jen to</span></button>
+<button class="mode red wide" data-m="chyby"><i class="no">🔁</i><em>${wr}</em><b>Opravna chyb</b><span>${wr?'Příklady, které se nepovedly – zkus je znovu':'Zatím žádné chyby – skvělé!'}</span></button></div>
+<h2>Přehled</h2><button class="ghost" style="width:100%" id="st">📊 Statistiky, trofeje a přehled pro rodiče</button>`;
+ $('home').querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>start(b.dataset.m));$('st').onclick=stats;$('tp').onclick=topicsView;show('home')}
+let TM;
+function topicMap(){const m={},add=(t,k,o)=>{t=t.replace('Cermat – ','');(m[t]=m[t]||{s:[],g:[]})[k].push(o)};
+ for(const k in database)database[k].forEach(x=>add(x.topic,'s',x));
+ ['6','7','8','9'].forEach(k=>G[k].forEach(f=>add(f().topic,'g',f)));return m}
+function topicsView(){TM=TM||topicMap();
+ const L=Object.keys(TM).map(t=>{const v=S.topics[t];return[t,v?Math.round(v.c/v.t*100):null]}).sort((a,b)=>(a[1]??-1)-(b[1]??-1));
+ $('topics').innerHTML=`<button class="ghost" id="b">← Domů</button><h2>Vyber téma (nejslabší nahoře)</h2><div class="modes">${L.map(t=>`<button class="mode top" data-t="${t[0]}"><b style="font-size:16px">${t[0]}</b><span>${t[1]==null?'ještě nehráno':t[1]+' % úspěšnost'}</span></button>`).join('')}</div>`;
+ $('b').onclick=home;$('topics').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>start('t:'+b.dataset.t));show('topics')}
+// ---- Zápas ----
+let M={};
+function build(mode){let L;
+ if(mode==='chyby')L=Object.values(S.wrong);
+ else if(mode==='dnes'){TM=TM||topicMap();L=[];Object.values(TM).forEach(t=>t.g.forEach(f=>{L.push(f(),f())}));L.push(...Object.values(S.wrong).slice(0,4))}
+ else if(mode==='exam'){L=database.cermat.slice();for(let i=0;i<40;i++)L.push(G.cermat[i%G.cermat.length]())}
+ else if(mode.startsWith('t:')){const t=TM[mode.slice(2)];L=t.s.slice();for(let i=0;i<10&&t.g.length;i++){const g=t.g[i%t.g.length]();if(!L.some(x=>x.q===g.q))L.push(g)}}
+ else{L=(database[mode]||[]).slice();for(let i=0;i<20;i++){const g=G[mode][i%G[mode].length]();if(!L.some(x=>x.q===g.q))L.push(g)}}
+ const sn=x=>(S.seen||[]).includes(x.q)?.04:1,w=x=>{if(mode==='exam')return sn(x);const t=S.topics[x.topic.replace('Cermat – ','')],b=S.box[x.q];return sn(x)*(t&&t.t>=2?1+2*(1-t.c/t.t):1.5)*(b===undefined?1:b===0?3:b===1?1.5:.4)};
+ return L.map(x=>[Math.random()**(1/w(x)),x]).sort((a,b)=>b[0]-a[0]).filter((x,i,A)=>A.findIndex(y=>y[1].q===x[1].q)===i).slice(0,mode==='exam'?16:10).map(p=>p[1])}
+function start(mode){const list=build(mode);if(!list.length){toast('Žádné chyby k opravě 👍');return}
+ TM=TM||topicMap();M={mode,list,i:0,c:0,combo:0,max:0,xp:0,res:[],us:[],rt:0,exam:mode==='exam',t0:Date.now()};
+ $('mode').textContent=modeName(mode);show('game');load()}
+function tick(){const s=Math.floor((Date.now()-M.t0)/1000),f=x=>Math.floor(x/60)+':'+String(x%60).padStart(2,'0');if(M.exam){$('clock').textContent='⏳ '+f(Math.max(0,3000-s));if(s>=3000)end()}else $('clock').textContent='⏱ '+f(s)}
+function prog(){$('prog').innerHTML=M.list.map((_,i)=>`<i class="${i===M.i&&i>=M.res.length?'cur':''}">${i<M.res.length?(M.exam?'•':M.res[i]?'💖':'🥀'):''}</i>`).join('')}
+function load(){const q=M.list[M.i];prog();tick();$('combo').textContent=M.combo>1&&!M.exam?'🔥 série '+M.combo:'Otázka '+(M.i+1)+'/'+M.list.length;
+ $('topic').textContent=q.topic;$('q').textContent=q.q;pClr();$('ans').value='';$('ans').disabled=false;$('fb').hidden=true;$('next').hidden=true;const O=!!q.o;$('ans').hidden=$('keys').hidden=$('act').hidden=O;$('opts').hidden=!O;
+ if(O)$('opts').innerHTML=q.o.map((t,i)=>{const y=t==='ANO'||t==='NE';return`<button class="ghost opt" data-v="${y?t:'ABCDE'[i]}">${y?'':'ABCDE'[i]+') '}${t}</button>`}).join('');else $('ans').focus()}
+function answer(skip,val){const q=M.list[M.i],v=val!==undefined?val:$('ans').value;M.us[M.i]=skip?'—':v;S.seen=[...(S.seen||[]),q.q].slice(-120);if(!skip&&!v.trim())return $('ans').focus();
+ const ok=!skip&&same(v,q.a);$('ans').disabled=true;$('act').hidden=true;$('opts').hidden=true;M.res.push(ok);
+ const t=q.topic.replace('Cermat – ',''),T=S.topics[t]=S.topics[t]||{c:0,t:0};T.t++;
+ if(ok){M.c++;M.combo++;M.max=Math.max(M.max,M.combo);S.mc=Math.max(S.mc||0,M.combo);if(!M.exam&&M.combo===3)toast('🎀 Trojka v řadě!');if(!M.exam&&M.combo===5)toast('🌟 Pětka v řadě!');const x=10+Math.min(M.combo-1,5)*2;M.xp+=x;T.c++;S.box[q.q]=Math.min((S.box[q.q]||0)+1,5);delete S.wrong[q.q];beep(660);beep(880,.15)}
+ else{M.combo=0;S.box[q.q]=0;S.wrong[q.q]={topic:q.topic,q:q.q,a:q.a,exp:q.exp,o:q.o};if(!M.exam&&M.rt<3){const t=TM[q.topic.replace('Cermat – ','')];if(t&&t.g.length){M.list.splice(M.i+3,0,pick(t.g)());M.rt++}}const k=Object.keys(S.wrong);if(k.length>40)delete S.wrong[k[0]];beep(200,.25)}
+ if(M.exam){prog();save();return next()}
+ const cor=q.o&&q.o.length>2?q.a+') '+q.o['ABCDE'.indexOf(q.a)]:q.a;
+ $('fb').hidden=false;$('fb').className='fb '+(ok?'ok':'no');
+ $('fb').innerHTML=`<b>${ok?'💖 SUPER! +'+(10+Math.min(M.combo-1,5)*2)+' XP':'🥀 Tentokrát ne. Správně: '+cor}</b><p>${q.exp}</p>`;
+ $('next').hidden=false;$('next').textContent=M.i===M.list.length-1?'Vyhodnotit kolo 🏆':'Další úkol ➔';$('next').focus();prog();save()}
+function next(){if(++M.i>=M.list.length)return end();load()}
+function end(){const n=M.list.length,pct=Math.round(M.c/n*100),sec=Math.floor((Date.now()-M.t0)/1000),before=lvl();
+ const today=new Date().toLocaleDateString('sv'),y=new Date(Date.now()-864e5).toLocaleDateString('sv');
+ if(S.last!==today){S.streak=S.last===y?S.streak+1:1;S.last=today}
+ if(pct>=80)M.xp+=20;if(M.c===n&&n>=10)S.pf=(S.pf||0)+1;S.xp+=M.xp;
+ if(MODES.some(x=>x[0]===M.mode)&&(S.best[M.mode]==null||pct>S.best[M.mode]))S.best[M.mode]=pct;
+ S.hist.unshift({d:today,m:M.mode,c:M.c,n,s:sec});S.hist=S.hist.slice(0,30);save();head();
+ const st=pct>=90?3:pct>=70?2:pct>=40?1:0,L=lvl(),esc=t=>String(t).replace(/</g,'&lt;'),rv=M.exam?`<h2>Rozbor generálky (orientačně ≈ ${Math.round(pct/2)} z 50 bodů)</h2><div class="panel">${M.list.map((q,i)=>M.res[i]===true?'':`<div class="rv"><i>✗</i> ${esc(q.q)}<br>Tvoje odpověď: ${esc(M.us[i]??'nezodpovězeno')} · správně: <b>${esc(q.a)}</b><br><span class="note">${esc(q.exp)}</span></div>`).join('')||'Bez chyby! 🏆'}</div>`:'';
+ $('result').innerHTML=`<div class="panel center"><div class="big">${'⭐'.repeat(st)||'🌱'}</div><h1 style="margin:8px 0">${M.exam?'Konec generálky!':'Konec kola!'}</h1>
+<p class="sum">Máš <b>${M.c}</b> správně z ${n} · ${pct} % · ⏱ ${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}</p>
+<p class="gold">${pct===100?'🏆 Dokonalé kolo!':pct>=80?'Skvělý výkon, jsi ve formě!':pct>=60?'Dobré kolo, ještě kousek!':pct>=40?'Každý trénink tě posune dál. Zkus to znovu!':'Každá šampionka trénuje – zkus to znovu!'}</p>
+<p class="sum">+${M.xp} XP · nejdelší série ${M.max}${L>before?`<br><span class="gold">⬆ Nová úroveň ${L}: ${TITLES[Math.min(L-1,5)]}!</span>`:''}</p>
+<div class="row" style="margin-top:16px"><button class="ghost" id="h">Domů</button><button class="btn" id="again">Znovu ✨</button></div></div>${rv}`;
+ $('h').onclick=home;$('again').onclick=()=>start(M.mode);show('result');if(pct>=70){beep(523);setTimeout(()=>beep(659),120);setTimeout(()=>beep(784,.25),240)}}
+// ---- Statistiky ----
+function report(){const w=Date.now()-7*864e5,H=S.hist.filter(x=>new Date(x.d)>=w),n=H.reduce((a,x)=>a+x.n,0),c=H.reduce((a,x)=>a+x.c,0),s=H.reduce((a,x)=>a+x.s,0);
+ const T=Object.entries(S.topics).filter(x=>x[1].t>=3).map(([k,v])=>[k,Math.round(v.c/v.t*100)]).sort((a,b)=>a[1]-b[1]),f=a=>a.map(x=>x[0]+' ('+x[1]+' %)').join(', ');
+ return `<p><b>Posledních 7 dní:</b> ${H.length} kol, úspěšnost ${n?Math.round(c/n*100):0} %, ${Math.round(s/60)} min tréninku. Denní série: ${S.streak}.</p><p><b>Doporučeno procvičit:</b> ${f(T.filter(x=>x[1]<70).slice(0,3))||'zatím nic zásadního'}.</p><p><b>Silné stránky:</b> ${f(T.filter(x=>x[1]>=80).slice(-3).reverse())||'zatím málo dat'}.</p>`}
+function stats(){const T=Object.entries(S.topics).map(([k,v])=>[k,Math.round(v.c/v.t*100)]).sort((a,b)=>a[1]-b[1]),{g}=tot();
+ const B=[['🎀','Trojka','3 správně za sebou',(S.mc||0)>=3],['🖐','Pětka','5 správně za sebou',(S.mc||0)>=5],['💎','Perfektní kolo','10 z 10 v kole',(S.pf||0)>=1],['📅','Týden v kuse','7 dní trénink',S.streak>=7],['⭐','Stovka','100 správných',g>=100],['🏆','Cermat 80 %','kolo na 80 %+',(S.best.cermat||0)>=80],['🎯','Všestranný','zkus všech 5 výzev',BASE.every(m=>S.best[m[0]]!=null)]];
+ $('stats').innerHTML=`<button class="ghost" id="b">← Domů</button><h2>Trofeje</h2><div class="badges">${B.map(x=>`<div class="bd${x[3]?'':' off'}">${x[0]} <b>${x[1]}</b>${x[2]}</div>`).join('')}</div>
+<h2>Přehled pro rodiče</h2><div class="panel rep">${report()}<button class="ghost" id="pr" style="width:100%;margin-top:8px">🖨 Vytisknout / uložit jako PDF</button></div>
+<h2>Témata (nejslabší nahoře)</h2><div class="panel">${T.length?T.map(t=>`<div class="t"><span>${t[0]}</span><div class="bar ${t[1]<60?'w':''}"><i style="width:${t[1]}%"></i></div><b>${t[1]} %</b></div>`).join(''):'<span class="note">Odehraj první kolo a tady se objeví výsledky.</span>'}</div>
+<h2>Poslední kola</h2><div class="panel">${S.hist.slice(0,10).map(x=>`<div class="h"><span>${modeName(x.m)} – ${x.c}/${x.n}</span><span>${x.d.slice(8)}. ${x.d.slice(5,7)}.</span></div>`).join('')||'<span class="note">Zatím nic.</span>'}</div>
+<button class="ghost" id="rs" style="width:100%;margin-top:6px;color:var(--bad)">Smazat veškerý postup</button>`;
+ $('b').onclick=home;$('pr').onclick=()=>{const L=lvl();$('sheet').innerHTML=`<h1>✨ Přehled tréninku</h1><p style="text-align:center;font-size:20px">${S.name} · úroveň ${L} – ${TITLES[Math.min(L-1,5)]}</p><p style="text-align:center">Celkem ${g} správně z ${g+tot().ms} pokusů · ${new Date().toLocaleDateString('cs-CZ')}</p>${report()}<table>${T.map(t=>`<tr><td>${t[0]}</td><td align="right">${t[1]} %</td></tr>`).join('')}</table>`;print()};
+ $('rs').onclick=()=>{if(confirm('Opravdu smazat XP, statistiky i chyby?')){localStorage.removeItem(LS);location.reload()}};show('stats')}
+// ---- Ovládání ----
+$('go').onclick=()=>answer();$('skip').onclick=()=>answer(true);$('next').onclick=next;$('quit').onclick=()=>{if(confirm('Opustit kolo? Průběh se nepočítá.'))home()};
+$('keys').onclick=e=>{const b=e.target.closest('button');if(b){$('ans').value+=b.dataset.k;$('ans').focus()}};$('opts').onclick=e=>{const b=e.target.closest('button');if(b)answer(false,b.dataset.v)};
+const pcv=$('pcv'),pcx=pcv.getContext('2d');let pDown=false,pEr=false;
+function pSz(){const d=devicePixelRatio||1;pcv.width=pcv.clientWidth*d;pcv.height=pcv.clientHeight*d;pcx.setTransform(d,0,0,d,0,0);pcx.lineCap=pcx.lineJoin='round'}
+function pClr(){pcx.save();pcx.setTransform(1,0,0,1,0,0);pcx.clearRect(0,0,pcv.width,pcv.height);pcx.restore()}
+pcv.onpointerdown=e=>{pDown=true;pcv.setPointerCapture(e.pointerId);pcx.beginPath();pcx.moveTo(e.offsetX,e.offsetY);pcx.globalCompositeOperation=pEr?'destination-out':'source-over';pcx.strokeStyle='#fff';pcx.lineWidth=pEr?22:2.6;pcx.lineTo(e.offsetX+.1,e.offsetY);pcx.stroke()};
+pcv.onpointermove=e=>{if(pDown){pcx.lineTo(e.offsetX,e.offsetY);pcx.stroke()}};
+pcv.onpointerup=pcv.onpointercancel=()=>{pDown=false};
+$('ptog').onclick=()=>{const h=$('ppad').hidden=!$('ppad').hidden;$('ptog').textContent=h?'✏️ Papír na počítání':'✏️ Skrýt papír';if(!h)pSz()};
+$('pers').onclick=()=>{pEr=!pEr;$('pers').textContent=pEr?'✏️ Tužka':'🧽 Guma'};$('pclr').onclick=pClr;
+$('snd').onclick=()=>{S.sound=S.sound?0:1;save();head()};
+$('ans').addEventListener('keydown',e=>{if(e.key==='Enter'&&!$('ans').disabled)answer()});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!$('next').hidden&&!$('game').hidden)next()});
+home();
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));
+</script>
+</body>
+</html>

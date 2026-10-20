@@ -1,0 +1,24 @@
+MATEMATICKÝ TRENAŽÉR (verze pro dívky) – PWA BALÍČEK
+
+CO JE UVNITŘ
+- index.html: samotný trenažér
+- manifest.webmanifest: název, ikona a nastavení instalace
+- service-worker.js: ukládání aplikace pro offline použití
+- icon-192.png a icon-512.png: ikony pro mobil
+
+DŮLEŽITÉ
+Aby šla aplikace nainstalovat jako PWA a fungovala offline, musí být dostupná z webové adresy přes HTTPS (výjimkou je localhost). Samotné otevření index.html ze ZIPu ani jeho otevření jako místního souboru na telefonu neumožní spolehlivě instalaci PWA ani service worker.
+
+JAK TO ZPROVOZNIT
+1. Rozbalte ZIP do počítače.
+2. Nahrajte VŠECHNY soubory a obě ikony do jedné složky na webhosting s HTTPS. Soubor index.html musí být v této složce.
+3. Otevřete výslednou HTTPS adresu na telefonu.
+4. Android (Chrome): menu ⋮ → „Instalovat aplikaci“ nebo „Přidat na plochu“.
+5. iPhone (Safari): tlačítko Sdílet → „Přidat na plochu“ → případně zapněte „Otevřít jako webovou aplikaci“ → Přidat.
+6. Nechte aplikaci jednou načíst, dokud je internet dostupný. Potom by se měla otevřít i offline.
+
+Pokud se soubory nahrávají do podsložky webu, nahrajte je všechny společně do téže podsložky; nepřejmenovávejte service-worker.js ani manifest.webmanifest.
+
+AKTUALIZACE: po nahrání nové verze otevřete aplikaci dvakrát (poprvé se stáhne novinka, podruhé se objeví). Postup Danových XP a chyb zůstává zachován.
+
+TIP: Nahrajte do jiné složky než Danovu verzi (např. /matika-holka/). Postup se ukládá zvlášť.
